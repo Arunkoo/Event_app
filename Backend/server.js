@@ -10,6 +10,8 @@ dotenv.config();
 // app Initialization
 const app = express();
 
+// middleware...
+app.use(express.json());
 // connect to database...
 connectDB();
 
