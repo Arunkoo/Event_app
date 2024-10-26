@@ -3,7 +3,7 @@ import { material } from "../assets/assest";
 const Add = () => {
   return (
     <div className="flex gap-10">
-      <div className=" w-[70%] h-[95vh] ml-[25px] mt-3  font-Poppins    rounded-md py-5 px-4 bg-[#79eb84]">
+      <div className=" w-[70%] h-[95vh] ml-[25px] mt-3  font-Poppins    rounded-md py-5 px-4 bg-[#79eb84]  shadow-green-700 shadow-2xl">
         <form className="flex flex-col gap-[20px]  text-normal ">
           {/* Title */}
           <div className=" flex  gap-[155px]">
