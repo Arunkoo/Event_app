@@ -6,10 +6,13 @@ import Add from "./Pages/Add";
 
 import Order from "./Pages/Order";
 import List from "./Pages/List";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
     <div>
+      <ToastContainer />
       <Navbar />
       <hr className="border-gray-400  mx-auto border-t-2" />
       <div className=" flex gap-3 ">

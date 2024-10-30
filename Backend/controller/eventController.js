@@ -28,9 +28,7 @@ const addEvent = async (req, res) => {
     res.json({ success: true, message: "Event Added" });
   } catch (error) {
     console.error("Error while adding event:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Error while adding event" });
+    res.json({ success: false, message: "Error while adding event" });
   }
 };
 

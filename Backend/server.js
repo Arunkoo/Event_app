@@ -4,6 +4,7 @@ import express from "express";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import eventRouter from "./Routes/eventRoute.js";
+import cors from "cors";
 
 // configuration
 dotenv.config();
@@ -11,6 +12,7 @@ dotenv.config();
 const app = express();
 
 // middleware...
+app.use(cors());
 app.use(express.json());
 // connect to database...
 connectDB();
