@@ -11,7 +11,7 @@ const addEvent = async (req, res) => {
         .json({ success: false, message: "Image file is required" });
     }
 
-    const image_filename = req.file.filename;
+    const image_filename = `${req.file.filename}`;
 
     // Create the new event with provided data
     const event = new eventModel({
@@ -50,10 +50,10 @@ const removeEvent = async (req, res) => {
     fs.unlink(`uploads/${event.image}`, () => {});
 
     await eventModel.findByIdAndDelete(req.body.id);
-    res.json({ success: true, message: "event Removed!" });
+    res.json({ success: true, message: "event is Deleted!" });
   } catch (error) {
     console.log(error);
-    res.json({ success: false, message: "Error while removing event" });
+    res.json({ success: false, message: "Error while Deleting event" });
   }
 };
 

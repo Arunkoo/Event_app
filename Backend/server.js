@@ -19,6 +19,7 @@ connectDB();
 
 // api endpoints...
 app.use("/api/event", eventRouter);
+app.use("/images", express.static("uploads"));
 
 const PORT = process.env.PORT;
 

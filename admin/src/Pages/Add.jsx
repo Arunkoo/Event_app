@@ -27,6 +27,17 @@ const Add = () => {
     setData((data) => ({ ...data, [name]: value }));
   };
 
+  // handler of images...
+  const onImageChange = (e) => {
+    const file = e.target.files[0];
+    // Check if file is in jpg or png format
+    if (file && (file.type === "image/jpeg" || file.type === "image/png")) {
+      setImage(file);
+    } else {
+      toast.error("Only JPG and PNG formats are allowed.");
+    }
+  };
+
   // onSubmit function....
   const onSubmitHandler = async (event) => {
     // ...
@@ -154,12 +165,7 @@ const Add = () => {
                 className=" w-[350px] h-[150px] object-contain cursor-pointer "
               />
             </label>
-            <input
-              onChange={(e) => setImage(e.target.files[0])}
-              type="file"
-              id="image"
-              hidden
-            />
+            <input onChange={onImageChange} type="file" id="image" hidden />
           </div>
           {/* button submit */}
           <div className=" flex justify-center items-center mt-5">
