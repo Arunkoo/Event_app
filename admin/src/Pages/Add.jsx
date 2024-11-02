@@ -1,11 +1,10 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { material } from "../assets/assest";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const Add = () => {
-  // url...
-  const url = "http://localhost:5000";
+const Add = ({ url }) => {
   // storing a image...
   const [image, setImage] = useState(false);
 

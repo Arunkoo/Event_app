@@ -1,10 +1,10 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const List = () => {
-  const url = "http://localhost:5000";
+const List = ({ url }) => {
   const [list, setList] = useState([]);
 
   // fetch all the events from the backend...
