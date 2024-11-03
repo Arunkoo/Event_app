@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import eventRouter from "./Routes/eventRoute.js";
 import cors from "cors";
+import userRouter from "./Routes/userRoute.js";
 
 // configuration
 dotenv.config();
@@ -19,6 +20,7 @@ connectDB();
 
 // api endpoints...
 app.use("/api/event", eventRouter);
+app.use("/api/user", userRouter);
 app.use("/images", express.static("uploads"));
 
 const PORT = process.env.PORT;
