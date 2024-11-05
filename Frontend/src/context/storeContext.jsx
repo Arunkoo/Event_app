@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
-import { createContext, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { event_list } from "../assests/assests";
+import axios from "axios";
 
 // storeName....
 export const StoreContext = createContext(null);
@@ -8,6 +9,8 @@ export const StoreContext = createContext(null);
 //provider just like a shokeeper...
 const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
+  const url = "http://localhost:4000";
+  const [eventList, setEventlist] = useState([]);
 
   // add to cart function..
   const AddToCart = async (itemId) => {
@@ -51,6 +54,21 @@ const StoreContextProvider = (props) => {
     return total;
   };
 
+  // fetch event  list function ......
+  const fetchEventList = async () => {
+    try {
+      const response = await axios.get(url + "/api/event/list");
+      setEventlist(response.data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // useEffect...
+  useEffect(() => {
+    fetchEventList();
+  }, []);
+
   // products or state to be passed...
   const contextValue = {
     AddToCart,
@@ -60,6 +78,8 @@ const StoreContextProvider = (props) => {
     GetTotalCartAmount,
     SalesTax,
     Grand_Total,
+    eventList,
+    url,
   };
   return (
     <StoreContext.Provider value={contextValue}>

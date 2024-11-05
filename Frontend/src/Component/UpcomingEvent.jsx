@@ -1,11 +1,13 @@
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import UpcomingCard from "./UpcomingCard";
-import { event_list } from "../assests/assests.js";
-import { useState } from "react";
 
+import { useState } from "react";
+import { useContext } from "react";
+import { StoreContext } from "../context/storeContext.jsx";
 const UpcomingEvent = () => {
   const Events = ["cultural", "Tech", "Non-Tech"];
+  const { eventList } = useContext(StoreContext);
   // states....
   const [value, setValue] = useState(null);
   console.log(value);
@@ -31,8 +33,8 @@ const UpcomingEvent = () => {
       </div>
       {/* card */}
       <div className="grid grid-cols-3 max-sm:grid-cols-1 gap-6 w-full mt-10">
-        {event_list.map((item, index) => {
-          if (value === item.category || (value === null && item.id < 7)) {
+        {eventList.map((item, index) => {
+          if (value === item.category || (value === null && index < 7)) {
             return (
               <UpcomingCard
                 key={index}

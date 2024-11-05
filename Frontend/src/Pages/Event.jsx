@@ -5,9 +5,13 @@ import { event_list } from "../assests/assests.js";
 import { useState } from "react";
 import Pagination from "@mui/material/Pagination";
 
+import { useContext } from "react";
+import { StoreContext } from "../context/storeContext.jsx";
+
 const Event = () => {
   const Events = ["cultural", "Tech", "Non-Tech"];
   const Options = ["Paid", "Unpaid"];
+  const { eventList } = useContext(StoreContext);
   const itemsPerPage = 9; // Define how many items to show per page
 
   // states
@@ -16,7 +20,7 @@ const Event = () => {
   const [currentPage, setCurrentPage] = useState(1); // For pagination
 
   // Filter events based on both category and price
-  const filteredEvents = event_list.filter((item) => {
+  const filteredEvents = eventList.filter((item) => {
     const categoryMatch = category === null || category === item.category;
     const paidMatch =
       paidOption === "Paid"

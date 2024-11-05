@@ -18,13 +18,14 @@ const UpcomingCard = ({
   // store values...
   const { AddToCart, cartItems, RemoveFromCart } = useContext(StoreContext);
   const isSmallScreen = useMediaQuery("(max-width:600px)"); //small screen breakpoint
+  const { url } = useContext(StoreContext);
   return (
     <div className=" p-4 border   shadow-xl transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110  duration-300 relative">
       <FavoriteBorderOutlinedIcon className="absolute mt-2 ml-[380px] text-white size-3 z-10 cursor-pointer transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110  duration-300 " />
       <ShareOutlinedIcon className="absolute mt-2 ml-[350px] text-white size-3 z-10 cursor-pointer transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110  duration-300" />
 
       <img
-        src={image}
+        src={`${url}/images/` + image}
         alt="item_image"
         className="w-full h-[290px] object-cover hover:contrast-75 "
       />
