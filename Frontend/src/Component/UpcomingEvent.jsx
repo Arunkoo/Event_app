@@ -38,7 +38,7 @@ const UpcomingEvent = () => {
             return (
               <UpcomingCard
                 key={index}
-                id={item.id}
+                id={item._id}
                 venue={item.venue}
                 title={item.title}
                 image={item.image}
