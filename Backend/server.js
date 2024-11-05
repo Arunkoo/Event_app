@@ -19,6 +19,7 @@ const app = express();
 connectDB();
 
 // Middleware...
+// Middleware...
 app.use(
   cors({
     origin: "http://localhost:5173", // Your frontend URL
@@ -32,12 +33,12 @@ app.use(express.json());
 // Auth configurations....
 app.use(
   session({
-    secret: "b8f4e1a3c9e0123f1d3f4d5e6c7b8f9e", // Your session secret
+    secret: "b8f4e1a3c9e0123f1d3f4d5e6c7b8f9e",
     resave: false,
     saveUninitialized: true,
     cookie: {
       maxAge: 24 * 60 * 60 * 1000, // Set cookie expiration (1 day)
-      secure: false, // Set to true for HTTPS (ensure your server uses HTTPS)
+      secure: false, // Use false for HTTP (not HTTPS) in local development
     },
   })
 );

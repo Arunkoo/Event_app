@@ -16,15 +16,16 @@ passport.use(
       try {
         let user = await userModel.findOne({ googleId: profile.id });
         if (!user) {
-          user = await userModel.create({
+          user = new userModel({
             googleId: profile.id,
             name: profile.displayName,
             email: profile.emails[0].value,
           });
+          await user.save();
         }
-        done(null, user);
+        return done(null, user);
       } catch (error) {
-        done(error, null);
+        return done(error, null);
       }
     }
   )

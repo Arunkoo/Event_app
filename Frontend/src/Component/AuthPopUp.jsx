@@ -1,9 +1,9 @@
-/* eslint-disable react/prop-types */
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useContext, useState } from "react";
 import { assest, Auth } from "../assests/assests";
 import { StoreContext } from "../context/storeContext";
+
 const AuthPopUp = ({ setShowAuth, currState, setCurrState }) => {
   // states...
   const { setToken, url } = useContext(StoreContext);
@@ -25,29 +25,41 @@ const AuthPopUp = ({ setShowAuth, currState, setCurrState }) => {
     setData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  // onlogin function..
+  // onLogin function..
   const onLogin = async (event) => {
     event.preventDefault();
-    const newUrl = `${url}/api/user/${currState}`;
+
+    // Construct the URL based on currState
+    const newUrl = `${url}/api/user/${currState}`; // Dynamic URL based on currState
+
     try {
       const response = await axios.post(newUrl, data, {
-        withCredentials: true,
+        withCredentials: true, // this ensures cookies are sent if needed (for sessions)
       });
+
       console.log("Response from server:", response); // Debugging line
-      toast.success("Logged out successfully!");
 
       if (response.data.success) {
         console.log("Token received:", response.data.token); // Debugging line
+
+        // Store the token and user data in context/localStorage
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
+
         toast.success(response.data.message);
-        setShowAuth(false);
+        setShowAuth(false); // Close the popup
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
       console.error("Error during login:", error);
-      toast.error("An error occurred. Please try again.");
+
+      // Show more specific error message if available
+      if (error.response && error.response.data) {
+        toast.error(error.response.data.message || "An error occurred");
+      } else {
+        toast.error("An error occurred. Please try again.");
+      }
     }
   };
 
@@ -61,7 +73,9 @@ const AuthPopUp = ({ setShowAuth, currState, setCurrState }) => {
         {/* login titles */}
 
         <div className=" flex items-center justify-between">
-          <h2 className=" text-2xl font-Poppins font-semibold">{currState}</h2>
+          <h2 className=" text-2xl font-Poppins font-semibold">
+            {currState === "login" ? "Login" : "SignUp"}
+          </h2>
           <img
             src={assest.close}
             onClick={() => setShowAuth(false)}

@@ -67,7 +67,7 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
               color="inherit"
               size={isSmallScreen ? "small" : "medium"}
               onClick={() => {
-                setCurrState("Login"); // Set currState to "Login"
+                setCurrState("login"); // Use lowercase "login"
                 setShowAuth(true); // Show the popup
               }}
             >
@@ -79,7 +79,7 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
               sx={{ backgroundColor: "black" }}
               size={isSmallScreen ? "small" : "medium"}
               onClick={() => {
-                setCurrState("Sign Up"); // Set currState to "Sign Up"
+                setCurrState("sign_Up"); // Use lowercase "sign_Up"
                 setShowAuth(true); // Show the popup
               }}
             >
