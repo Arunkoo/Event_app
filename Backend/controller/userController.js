@@ -1,92 +1,62 @@
 // imports..
-import userModel from "../Models/userModel.js";
+
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import validator from "validator";
-import dotenv from "dotenv";
+import { configDotenv } from "dotenv";
+import userModel from "../Models/userModel.js";
 
-dotenv.config();
+configDotenv();
 // Creating a Token using JWT....
-const createToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+const createToken = (id, name, profileImage) => {
+  return jwt.sign({ id, name, profileImage }, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
 };
+
 // Register User api ....
+// authController.js
+
+// Register User API
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
+  // Your existing code for registration...
 
-  try {
-    // if the user already exist than
-    const exists = await userModel.findOne({ email });
-    if (exists) {
-      return res.json({
-        success: false,
-        message: "User  already exists.",
-      });
-    }
+  // Create a token for the user after saving to the database
+  const token = createToken(user._id);
 
-    // validating email
-    if (!validator.isEmail(email)) {
-      return res.json({
-        success: false,
-        message: "Invalid email address!",
-      });
-    }
-    // checking password
-    if (password.length < 8) {
-      return res.json({
-        success: false,
-        message: "Enter a strong password with minimum 8 characters.",
-      });
-    }
-
-    // Hashing user Passsword...
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    // creating new user in user model....
-    const newUser = new userModel({
-      name,
-      email,
-      password: hashedPassword,
-    });
-
-    const user = await newUser.save();
-    const token = createToken(user._id);
-    res.json({
-      success: true,
-      token,
-      message: "Account created successfully.",
-    });
-  } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Internal server error." });
-  }
+  // Return success, token, and user details
+  res.json({
+    success: true,
+    token,
+    user: {
+      name: user.name,
+      email: user.email,
+      profileImage: user.profileImage || null,
+    }, // Include user data
+    message: "Account created successfully.",
+  });
 };
 
-//Login User api
-
+// Login User API
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-  try {
-    const user = await userModel.findOne({ email });
-    // check if user exists...
-    if (!user) {
-      return res.json({ success: false, message: "user dosen't exist." });
-    }
-    // matching password...
-    const isMatch = await bcrypt.compare(password, user.password);
-    // check if matched ......or not marched
-    if (!isMatch) {
-      return res.json({ success: false, message: "Invalid credentials." });
-    }
+  // Your existing code for login...
 
-    // if all things are ok create token and return a res with token to fetch in frontend..
-    const token = createToken(user._id);
-    res.json({ success: true, token, message: "Logged in successfully!" });
-  } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Internal server error!" });
-  }
+  const token = createToken(user._id);
+
+  // Return success, token, and user details
+  res.json({
+    success: true,
+    token,
+    user: {
+      name: user.name,
+      email: user.email,
+      profileImage: user.profileImage || null,
+    }, // Include user data
+    message: "Logged in successfully!",
+  });
 };
 
-export { loginUser, registerUser };
+export { loginUser, registerUser, createToken };

@@ -11,6 +11,7 @@ const StoreContextProvider = (props) => {
   const [cartItems, setCartItems] = useState({});
   const url = "http://localhost:4000";
   const [eventList, setEventlist] = useState([]);
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
 
   // add to cart function..
   const AddToCart = async (itemId) => {
@@ -67,7 +68,12 @@ const StoreContextProvider = (props) => {
   // useEffect...
   useEffect(() => {
     fetchEventList();
-  }, []);
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("token");
+    }
+  }, [token]);
 
   // products or state to be passed...
   const contextValue = {
@@ -80,6 +86,8 @@ const StoreContextProvider = (props) => {
     Grand_Total,
     eventList,
     url,
+    token,
+    setToken,
   };
   return (
     <StoreContext.Provider value={contextValue}>

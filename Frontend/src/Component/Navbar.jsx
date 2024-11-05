@@ -10,16 +10,26 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { NavLink } from "react-router-dom";
 import { useContext } from "react";
 import { StoreContext } from "../context/storeContext";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ setShowAuth, setCurrState }) => {
   const isSmallScreen = useMediaQuery("(max-width:600px)");
   const isLargeScreen = useMediaQuery("(min-width:1024px)");
   // store value ...
-  const { cartItems } = useContext(StoreContext);
+  const { cartItems, token, setToken } = useContext(StoreContext);
+  const navigate = useNavigate();
   const totalItems = Object.values(cartItems).reduce(
     (acc, count) => acc + count,
     0
   );
+
+  const onLogout = () => {
+    setToken(null);
+    localStorage.removeItem("token");
+    toast.success("Logged out successfully!");
+    navigate("/");
+  };
 
   return (
     <div className="flex flex-1 items-center justify-between gap-10 w-full border-b-2">
@@ -50,30 +60,42 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
             <LocalMallOutlinedIcon sx={{ fontSize: isSmallScreen ? 30 : 35 }} />
           </Badge>
         </NavLink>
-
-        <Button
-          variant="outlined"
-          color="inherit"
-          size={isSmallScreen ? "small" : "medium"}
-          onClick={() => {
-            setCurrState("Login"); // Set currState to "Login"
-            setShowAuth(true); // Show the popup
-          }}
-        >
-          Login
-        </Button>
-        <Button
-          variant="contained"
-          endIcon={<ArrowOutwardOutlinedIcon />}
-          sx={{ backgroundColor: "black" }}
-          size={isSmallScreen ? "small" : "medium"}
-          onClick={() => {
-            setCurrState("Sign Up"); // Set currState to "Sign Up"
-            setShowAuth(true); // Show the popup
-          }}
-        >
-          Get Started
-        </Button>
+        {!token ? (
+          <>
+            <Button
+              variant="outlined"
+              color="inherit"
+              size={isSmallScreen ? "small" : "medium"}
+              onClick={() => {
+                setCurrState("Login"); // Set currState to "Login"
+                setShowAuth(true); // Show the popup
+              }}
+            >
+              Login
+            </Button>
+            <Button
+              variant="contained"
+              endIcon={<ArrowOutwardOutlinedIcon />}
+              sx={{ backgroundColor: "black" }}
+              size={isSmallScreen ? "small" : "medium"}
+              onClick={() => {
+                setCurrState("Sign Up"); // Set currState to "Sign Up"
+                setShowAuth(true); // Show the popup
+              }}
+            >
+              Get Started
+            </Button>
+          </>
+        ) : (
+          <Button
+            variant="contained"
+            sx={{ backgroundColor: "black" }}
+            size={isSmallScreen ? "small" : "medium"}
+            onClick={onLogout}
+          >
+            LogOut
+          </Button>
+        )}
 
         {!isLargeScreen && (
           <MenuIcon sx={{ fontSize: 30, cursor: "pointer" }} />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "./App.css";
 import Footer from "./Component/Footer";
 import Navbar from "./Component/Navbar";
@@ -10,10 +10,25 @@ import Cart from "./Pages/Cart";
 import PlaceOrder from "./Pages/PlaceOrder";
 import AboutUs from "./Pages/AboutUs";
 import ContactUs from "./Pages/ContactUs";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useLocation, useSearchParams } from "react-router-dom";
+import { StoreContext } from "./context/storeContext";
 
 function App() {
   const [showAuth, setShowAuth] = useState(false); // state for showing popup
-  const [currState, setCurrState] = useState("Sign Up"); // state to track Login or Sign Up
+  const [currState, setCurrState] = useState("sign_Up"); // state to track Login or Sign Up
+
+  const { setToken } = useContext(StoreContext);
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  useEffect(() => {
+    const token = searchParams.get("token");
+    if (token) {
+      setToken(token);
+      localStorage.setItem("token", token); // Persist token in localStorage
+    }
+  }, [searchParams, setToken]);
 
   return (
     <>
@@ -42,6 +57,7 @@ function App() {
 
         <Footer />
       </div>
+      <ToastContainer />
     </>
   );
 }
