@@ -12,6 +12,8 @@ const Cart = () => {
     GetTotalCartAmount,
     SalesTax,
     Grand_Total,
+    eventList,
+    url,
   } = useContext(StoreContext);
 
   const isCartEmpty = Object.values(cartItems).every((count) => count === 0); // Check if the cart is empty
@@ -41,14 +43,14 @@ const Cart = () => {
           <br />
           <hr className="h-[1px] bg-slate-200 w-[60%]" />
 
-          {event_list.map((item) => {
-            if (cartItems[item.id] > 0) {
+          {eventList.map((item) => {
+            if (cartItems[item._id] > 0) {
               return (
-                <div key={item.id}>
+                <div key={item._id}>
                   {/* Cart item details */}
                   <div className="mt-[10px] mb-[10px] grid grid-cols-5 items-center   text-gray-600 font-Poppins text-normal">
                     <img
-                      src={item.image}
+                      src={`${url}/images/` + item.image}
                       alt="cart_image"
                       className="w-[150px] h-[85px] object-cover"
                     />
@@ -56,7 +58,7 @@ const Cart = () => {
                     <p>₹{item.price}</p>
                     <button
                       className=""
-                      onClick={() => RemoveFromCart(item.id)}
+                      onClick={() => RemoveFromCart(item._id)}
                     >
                       <RemoveCircleIcon className="cursor-pointer" />
                     </button>

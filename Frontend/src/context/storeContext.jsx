@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { createContext, useEffect, useState } from "react";
-import { event_list } from "../assests/assests";
+
 import axios from "axios";
 
 // storeName....
@@ -8,9 +8,13 @@ export const StoreContext = createContext(null);
 
 //provider just like a shokeeper...
 const StoreContextProvider = (props) => {
-  const [cartItems, setCartItems] = useState({});
-  const url = "http://localhost:4000";
   const [eventList, setEventlist] = useState([]);
+  const [cartItems, setCartItems] = useState(
+    eventList.reduce((acc, event) => ({ ...acc, [event._id]: 0 }), {})
+  );
+
+  const url = "http://localhost:4000";
+
   const [token, setToken] = useState(localStorage.getItem("token") || null);
 
   // add to cart function..
@@ -33,7 +37,7 @@ const StoreContextProvider = (props) => {
 
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
-        let itemInfo = event_list.find((event) => event.id === Number(item));
+        let itemInfo = eventList.find((event) => event._id == item); // Use == to handle both Number and String
 
         if (itemInfo) {
           totalAmount += itemInfo.price * cartItems[item];
@@ -66,14 +70,22 @@ const StoreContextProvider = (props) => {
   };
 
   // useEffect...
-  useEffect(() => {
-    fetchEventList();
-    if (token) {
-      localStorage.setItem("token", token);
-    } else {
-      localStorage.removeItem("token");
-    }
-  }, [token]);
+  useEffect(
+    () => {
+      fetchEventList();
+      if (token) {
+        localStorage.setItem("token", token);
+      } else {
+        localStorage.removeItem("token");
+      }
+
+      GetTotalCartAmount();
+      SalesTax();
+      Grand_Total();
+    },
+    [token],
+    [eventList, cartItems]
+  );
 
   // products or state to be passed...
   const contextValue = {
