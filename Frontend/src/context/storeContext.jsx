@@ -1,106 +1,142 @@
-/* eslint-disable react/prop-types */
 import { createContext, useEffect, useState } from "react";
-
 import axios from "axios";
-
-// storeName....
+import { toast } from "react-toastify";
+import authPopUp from "../Component/AuthPopUp";
 export const StoreContext = createContext(null);
 
-//provider just like a shokeeper...
 const StoreContextProvider = (props) => {
-  const [eventList, setEventlist] = useState([]);
-  const [cartItems, setCartItems] = useState(
-    eventList.reduce((acc, event) => ({ ...acc, [event._id]: 0 }), {})
-  );
-
+  const [eventList, setEventList] = useState([]);
+  const [cartItems, setCartItems] = useState({});
+  const [showAuth, setShowAuth] = useState(false);
   const url = "http://localhost:4000";
-
   const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [totalCartAmount, setTotalCartAmount] = useState(0);
+  const [salesTax, setSalesTax] = useState(0);
+  const [grandTotal, setGrandTotal] = useState(0);
 
-  // add to cart function..
+  const notifyLoginRequired = () => {
+    toast.info("Please log in to continue.");
+    setShowAuth(true); // Show authPop component
+  };
+
   const AddToCart = async (itemId) => {
-    // there is not any item present in the cart...
-    if (!cartItems[itemId]) {
-      setCartItems((prev) => ({ ...prev, [itemId]: 1 }));
+    if (!token) {
+      notifyLoginRequired();
+      return;
     }
-    console.log(cartItems);
-  };
-  // remove from cart...
-  const RemoveFromCart = async (itemId) => {
-    setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }));
-    console.log(cartItems);
+    setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+    try {
+      await axios.post(
+        `${url}/api/cart/add`,
+        { itemId },
+        { headers: { token } }
+      );
+    } catch (error) {
+      console.error("Error adding item to cart:", error);
+    }
   };
 
-  // get Total Amount.....
+  const RemoveFromCart = async (itemId) => {
+    if (!token) {
+      notifyLoginRequired();
+      return;
+    }
+    setCartItems((prev) => {
+      const newCount = (prev[itemId] || 0) - 1;
+      return { ...prev, [itemId]: newCount > 0 ? newCount : 0 };
+    });
+    try {
+      await axios.post(
+        `${url}/api/cart/remove`,
+        { itemId },
+        { headers: { token } }
+      );
+    } catch (error) {
+      console.error("Error while removing item", error);
+    }
+  };
   const GetTotalCartAmount = () => {
     let totalAmount = 0;
-
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
-        let itemInfo = eventList.find((event) => event._id == item); // Use == to handle both Number and String
-
+        const itemInfo = eventList.find((event) => event._id == item);
         if (itemInfo) {
           totalAmount += itemInfo.price * cartItems[item];
         }
       }
     }
-
     return totalAmount;
   };
 
-  // sales tax function ....
-  const SalesTax = () => {
-    const percentage = (GetTotalCartAmount() * 2) / 100;
-    return percentage;
+  const SalesTax = () => (GetTotalCartAmount() * 2) / 100;
+  const Grand_Total = () => GetTotalCartAmount() + SalesTax();
+
+  const loadCartData = async (token) => {
+    try {
+      const response = await axios.get(`${url}/api/cart/get`, {
+        headers: { token },
+      });
+      setCartItems(response.data.data || {});
+    } catch (error) {
+      console.error("Error fetching cart data:", error);
+    }
   };
 
-  const Grand_Total = () => {
-    const total = GetTotalCartAmount() + SalesTax();
-    return total;
-  };
-
-  // fetch event  list function ......
   const fetchEventList = async () => {
     try {
-      const response = await axios.get(url + "/api/event/list");
-      setEventlist(response.data.data);
+      const response = await axios.get(`${url}/api/event/list`);
+      setEventList(response.data.data);
     } catch (error) {
       console.log(error);
     }
   };
 
-  // useEffect...
-  useEffect(
-    () => {
-      fetchEventList();
-      if (token) {
-        localStorage.setItem("token", token);
-      } else {
-        localStorage.removeItem("token");
+  useEffect(() => {
+    async function loadData() {
+      try {
+        await fetchEventList(); // Load the event list for display
+
+        if (token) {
+          // If the user is logged in
+          setToken(token); // Sync token state with localStorage
+          await loadCartData(token); // Load the cart data for logged-in users
+        }
+      } catch (error) {
+        console.error("Error while fetching:", error);
       }
+    }
 
-      GetTotalCartAmount();
-      SalesTax();
-      Grand_Total();
-    },
-    [token],
-    [eventList, cartItems]
-  );
+    // Call loadData to initialize on mount or token change
+    loadData();
 
-  // products or state to be passed...
+    // Sync localStorage with token state
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      localStorage.removeItem("token");
+      setCartItems({}); // Clear cart data when logged out
+    }
+
+    // Update totals for the cart
+    setTotalCartAmount(GetTotalCartAmount());
+    setSalesTax(SalesTax());
+    setGrandTotal(Grand_Total());
+  }, [token, eventList, cartItems]);
+
   const contextValue = {
     AddToCart,
     cartItems,
     setCartItems,
     RemoveFromCart,
-    GetTotalCartAmount,
-    SalesTax,
-    Grand_Total,
+    totalCartAmount,
+    salesTax,
+    grandTotal,
     eventList,
     url,
     token,
     setToken,
   };
+
   return (
     <StoreContext.Provider value={contextValue}>
       {props.children}
@@ -108,5 +144,4 @@ const StoreContextProvider = (props) => {
   );
 };
 
-// eslint-disable-next-line react-refresh/only-export-components
 export default StoreContextProvider;

@@ -75,14 +75,14 @@ const Cart = () => {
               <p className="mb-1 font-Poppins text-base font-medium">
                 SubTotal :{" "}
                 <span className="text-slate-500 ml-2 font-normal">
-                  ₹ {GetTotalCartAmount()}
+                  ₹ {GetTotalCartAmount}
                 </span>
               </p>
               <hr className="h-[1px] bg-slate-200" />
               <p className="mb-1 font-Poppins text-base font-medium">
                 Sales Tax (2%) :{" "}
                 <span className="text-slate-500 ml-2 font-normal">
-                  ₹ {SalesTax()}
+                  ₹ {SalesTax}
                 </span>
               </p>
               <hr className="h-[1px] bg-slate-200" />
@@ -90,7 +90,7 @@ const Cart = () => {
               <p className="mt-1 font-Poppins text-base font-medium mb-3">
                 Grand Total :{" "}
                 <span className=" ml-2 text-slate-500 font-normal">
-                  ₹ {Grand_Total()}
+                  ₹ {Grand_Total}
                 </span>
               </p>
               <hr className="h-[1px] bg-slate-200" />

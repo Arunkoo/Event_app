@@ -17,7 +17,7 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
   const isSmallScreen = useMediaQuery("(max-width:600px)");
   const isLargeScreen = useMediaQuery("(min-width:1024px)");
   // store value ...
-  const { cartItems, token, setToken } = useContext(StoreContext);
+  const { cartItems, token, setToken, setCartItems } = useContext(StoreContext);
   const navigate = useNavigate();
   const totalItems = Object.values(cartItems).reduce(
     (acc, count) => acc + count,
@@ -26,9 +26,11 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
 
   const onLogout = () => {
     setToken(null);
+    setCartItems({}); // Clear user-specific data
     localStorage.removeItem("token");
     toast.success("Logged out successfully!");
-    navigate("/");
+    navigate("/"); // Redirect to the homepage
+    window.location.reload(); // Force an immediate page reload
   };
 
   return (

@@ -9,6 +9,7 @@ import "./config/passport.js";
 import session from "express-session";
 import passport from "passport";
 import authRouter from "./Routes/userRoute.js";
+import cartRouter from "./Routes/cartRoute.js";
 
 // configuration
 configDotenv();
@@ -49,6 +50,7 @@ app.use(passport.session());
 // API endpoints...
 app.use("/api/event", eventRouter);
 app.use("/api/user", authRouter);
+app.use("/api/cart", cartRouter);
 app.use("/images", express.static("uploads"));
 
 // Default route
