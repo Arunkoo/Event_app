@@ -50,7 +50,7 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
         <NavLink to={"/contact"}>Contact Us</NavLink>
       </div>
 
-      <Stack direction="row" spacing={isSmallScreen ? 1.5 : 3}>
+      <Stack direction="row" spacing={isSmallScreen ? 1.5 : 3} marginRight={4}>
         <NavLink to={"/cart"}>
           <Badge
             className=" absolute ml-3"

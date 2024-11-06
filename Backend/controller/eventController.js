@@ -13,13 +13,33 @@ const addEvent = async (req, res) => {
 
     const image_filename = `${req.file.filename}`;
 
+    // Ensure date is in the correct format
+    let eventDate = req.body.date ? new Date(req.body.date) : new Date();
+
+    // Validate the date
+    if (isNaN(eventDate.getTime())) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid date format" });
+    }
+
+    console.log("Event Data:", {
+      title: req.body.title,
+      image: image_filename,
+      venue: req.body.venue,
+      description: req.body.description,
+      date: eventDate,
+      category: req.body.category,
+      price: req.body.price,
+    });
+
     // Create the new event with provided data
     const event = new eventModel({
       title: req.body.title,
       image: image_filename,
       venue: req.body.venue,
       description: req.body.description,
-      Date: req.body.Date,
+      date: eventDate,
       category: req.body.category,
       price: req.body.price,
     });
@@ -28,7 +48,10 @@ const addEvent = async (req, res) => {
     res.json({ success: true, message: "Event Added" });
   } catch (error) {
     console.error("Error while adding event:", error);
-    res.json({ success: false, message: "Error while adding event" });
+    res.json({
+      success: false,
+      message: error.message || "Error while adding event",
+    });
   }
 };
 

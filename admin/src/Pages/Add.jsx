@@ -47,7 +47,7 @@ const Add = ({ url }) => {
     formData.append("venue", data.venue);
     formData.append("category", data.category);
     formData.append("price", Number(data.price));
-    formData.append("date", Number(data.date));
+    formData.append("date", data.date);
     formData.append("image", image);
     // api call from backend...
 

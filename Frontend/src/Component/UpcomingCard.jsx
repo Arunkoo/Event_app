@@ -32,7 +32,13 @@ const UpcomingCard = ({
 
       <div className="flex flex-1 flex-col mt-1">
         <span className="flex justify-start items-center gap-1 font-Poppins text-xs text-slate-600">
-          <p>{date}</p>
+          <p>
+            {new Date(date).toLocaleDateString("en-GB", {
+              day: "2-digit",
+              month: "short",
+            })}
+          </p>
+
           <p>|</p>
           <p>{venue}</p>
         </span>
