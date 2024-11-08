@@ -1,4 +1,5 @@
-import { createContext, useEffect, useState } from "react";
+/* eslint-disable react/prop-types */
+import { createContext, useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -10,9 +11,11 @@ const StoreContextProvider = (props) => {
   const [showAuth, setShowAuth] = useState(false);
   const url = "http://localhost:4000";
   const [token, setToken] = useState(localStorage.getItem("token") || null);
-  const [totalCartAmount, setTotalCartAmount] = useState(0);
-  const [salesTax, setSalesTax] = useState(0);
-  const [grandTotal, setGrandTotal] = useState(0);
+  const [totals, setTotals] = useState({
+    totalCartAmount: 0,
+    salesTax: 0,
+    grandTotal: 0,
+  });
 
   const notifyLoginRequired = () => {
     toast.info("Please log in to continue.");
@@ -55,82 +58,67 @@ const StoreContextProvider = (props) => {
       console.error("Error while removing item", error);
     }
   };
-  const GetTotalCartAmount = () => {
+
+  const calculateTotals = useMemo(() => {
     let totalAmount = 0;
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
-        const itemInfo = eventList.find((event) => event._id == item);
+        const itemInfo = eventList.find((event) => event._id === item);
         if (itemInfo) {
           totalAmount += itemInfo.price * cartItems[item];
         }
       }
     }
-    return totalAmount;
-  };
+    const salesTax = (totalAmount * 2) / 100;
+    const grandTotal = totalAmount + salesTax;
 
-  const SalesTax = () => (GetTotalCartAmount() * 2) / 100;
-  const Grand_Total = () => GetTotalCartAmount() + SalesTax();
-
-  const loadCartData = async (token) => {
-    try {
-      const response = await axios.get(`${url}/api/cart/get`, {
-        headers: { token },
-      });
-      setCartItems(response.data.data || {});
-    } catch (error) {
-      console.error("Error fetching cart data:", error);
-    }
-  };
-
-  const fetchEventList = async () => {
-    try {
-      const response = await axios.get(`${url}/api/event/list`);
-      setEventList(response.data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+    return { totalCartAmount: totalAmount, salesTax, grandTotal };
+  }, [cartItems, eventList]);
 
   useEffect(() => {
     async function loadData() {
       try {
-        await fetchEventList(); // Load the event list for display
+        // Fetch event list once
+        const eventResponse = await axios.get(`${url}/api/event/list`);
+        setEventList(eventResponse.data.data);
 
+        // Load cart data for logged-in users
         if (token) {
-          // If the user is logged in
-          setToken(token); // Sync token state with localStorage
-          await loadCartData(token); // Load the cart data for logged-in users
+          const cartResponse = await axios.get(`${url}/api/cart/get`, {
+            headers: { token },
+          });
+          setCartItems(cartResponse.data.data || {});
         }
       } catch (error) {
-        console.error("Error while fetching:", error);
+        console.error("Error while fetching data:", error);
       }
     }
 
-    // Call loadData to initialize on mount or token change
+    // Initial data load
     loadData();
 
-    // Sync localStorage with token state
+    // Store token to localStorage if available
     if (token) {
       localStorage.setItem("token", token);
     } else {
       localStorage.removeItem("token");
       setCartItems({}); // Clear cart data when logged out
     }
+  }, [token]);
 
-    // Update totals for the cart
-    setTotalCartAmount(GetTotalCartAmount());
-    setSalesTax(SalesTax());
-    setGrandTotal(Grand_Total());
-  }, [token, eventList, cartItems]);
+  // Update totals only when cartItems or eventList changes
+  useEffect(() => {
+    setTotals(calculateTotals);
+  }, [calculateTotals]);
 
   const contextValue = {
     AddToCart,
     cartItems,
     setCartItems,
     RemoveFromCart,
-    totalCartAmount,
-    salesTax,
-    grandTotal,
+    totalCartAmount: totals.totalCartAmount,
+    salesTax: totals.salesTax,
+    grandTotal: totals.grandTotal,
     eventList,
     url,
     token,

@@ -10,7 +10,6 @@ const UpcomingEvent = () => {
   const { eventList } = useContext(StoreContext);
   // states....
   const [value, setValue] = useState(null);
-  console.log(value);
 
   return (
     <div
