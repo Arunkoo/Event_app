@@ -1,8 +1,7 @@
 import { useContext } from "react";
 import { StoreContext } from "../context/storeContext";
 const PlaceOrder = () => {
-  const { GetTotalCartAmount, SalesTax, Grand_Total } =
-    useContext(StoreContext);
+  const { totalCartAmount, salesTax, grandTotal } = useContext(StoreContext);
   return (
     <form>
       <h1 className=" font-Poppins text-2xl font-semibold text-center mt-4">
@@ -52,14 +51,14 @@ const PlaceOrder = () => {
             <p className=" font-Poppins text-base font-medium">
               SubTotal :{" "}
               <span className="text-slate-500 ml-2 font-normal">
-                ₹ {GetTotalCartAmount()}
+                ₹ {totalCartAmount}
               </span>
             </p>
             <hr className="h-[1px] bg-slate-200" />
             <p className=" font-Poppins text-base font-medium">
               Sales Tax (2%) :{" "}
               <span className="text-slate-500 ml-2 font-normal">
-                ₹ {SalesTax()}
+                ₹ {salesTax}
               </span>
             </p>
             <hr className="h-[1px] bg-slate-200" />
@@ -67,7 +66,7 @@ const PlaceOrder = () => {
             <p className=" font-Poppins text-base font-medium">
               Grand Total :{" "}
               <span className=" ml-2 text-slate-500 font-normal">
-                ₹ {Grand_Total()}
+                ₹ {grandTotal}
               </span>
             </p>
             <hr className="h-[1px] bg-slate-200" />
