@@ -86,6 +86,13 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
+  // Check if the email and password are provided
+  if (!email || !password) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Email and password are required." });
+  }
+
   // Check if the email exists
   const user = await userModel.findOne({ email });
 
@@ -93,29 +100,48 @@ const loginUser = async (req, res) => {
     return res.status(400).json({ success: false, message: "User not found" });
   }
 
-  // Validate password (assumes password is hashed in DB)
-  const isMatch = await bcrypt.compare(password, user.password);
-
-  if (!isMatch) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid credentials" });
+  // If the user logged in with Google, skip password check
+  if (!user.password) {
+    return res.status(200).json({
+      success: true,
+      message: "Logged in successfully with Google!",
+      token: createToken(user._id, user.name, user.profileImage),
+      user: {
+        name: user.name,
+        email: user.email,
+        profileImage: user.profileImage || null,
+      },
+    });
   }
 
-  // Create JWT token
-  const token = createToken(user._id, user.name, user.profileImage);
+  // Validate password for regular users
+  try {
+    const isMatch = await bcrypt.compare(password, user.password);
 
-  // Respond with token and user details
-  res.json({
-    success: true,
-    token,
-    user: {
-      name: user.name,
-      email: user.email,
-      profileImage: user.profileImage || null,
-    },
-    message: "Logged in successfully!",
-  });
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid credentials" });
+    }
+
+    // Create JWT token
+    const token = createToken(user._id, user.name, user.profileImage);
+
+    // Respond with token and user details
+    res.json({
+      success: true,
+      token,
+      user: {
+        name: user.name,
+        email: user.email,
+        profileImage: user.profileImage || null,
+      },
+      message: "Logged in successfully!",
+    });
+  } catch (err) {
+    console.error("Error during bcrypt comparison:", err);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
 };
 
 export { loginUser, registerUser, createToken };

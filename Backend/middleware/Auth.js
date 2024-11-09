@@ -4,16 +4,15 @@ import { OAuth2Client } from "google-auth-library";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const authMiddleware = async (req, res, next) => {
-  // Get token from header or cookie
   const token =
     req.headers.authorization?.replace("Bearer ", "") || req.cookies?.token;
-
   if (!token) {
     return res.status(401).json({ success: false, message: "Not authorized" });
   }
 
   try {
     const token_decode = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded JWT Token:", token_decode); // Log decoded token
     req.user = { id: token_decode.id };
     return next();
   } catch (error) {
@@ -26,6 +25,7 @@ const authMiddleware = async (req, res, next) => {
           audience: process.env.GOOGLE_CLIENT_ID,
         });
         const payload = ticket.getPayload();
+        console.log("Google Token Payload:", payload); // Log Google token payload
         req.user = { id: payload.sub };
         return next();
       } catch (googleError) {

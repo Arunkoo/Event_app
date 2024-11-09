@@ -10,14 +10,17 @@ const Myorders = () => {
 
   //   fetch orders....
   const fetchOrders = async () => {
-    const response = await axios.post(
-      url + "/api/order/userorders",
-      {},
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-    setData(response.data.data);
+    try {
+      const response = await axios.post(
+        url + "/api/order/userorders",
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log(response); // Log full response
+      setData(response.data.data);
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
   };
 
   useEffect(() => {

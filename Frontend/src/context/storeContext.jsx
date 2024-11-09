@@ -27,13 +27,19 @@ const StoreContextProvider = (props) => {
       notifyLoginRequired();
       return;
     }
+
     setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
+
     try {
-      await axios.post(
+      const response = await axios.post(
         `${url}/api/cart/add`,
         { itemId },
-        { headers: { token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+      // Check if the backend response includes the updated cartData
+      if (response.data.success) {
+        setCartItems(response.data.data); // Update cart with the latest data from the backend
+      }
     } catch (error) {
       console.error("Error adding item to cart:", error);
     }
@@ -44,18 +50,24 @@ const StoreContextProvider = (props) => {
       notifyLoginRequired();
       return;
     }
+
     setCartItems((prev) => {
       const newCount = (prev[itemId] || 0) - 1;
       return { ...prev, [itemId]: newCount > 0 ? newCount : 0 };
     });
+
     try {
-      await axios.post(
+      const response = await axios.post(
         `${url}/api/cart/remove`,
         { itemId },
-        { headers: { token } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
+      // Check if the backend response includes the updated cartData
+      if (response.data.success) {
+        setCartItems(response.data.data); // Update cart with the latest data from the backend
+      }
     } catch (error) {
-      console.error("Error while removing item", error);
+      console.error("Error while removing item from cart:", error);
     }
   };
 
@@ -85,8 +97,9 @@ const StoreContextProvider = (props) => {
         // Load cart data for logged-in users
         if (token) {
           const cartResponse = await axios.get(`${url}/api/cart/get`, {
-            headers: { token },
+            headers: { Authorization: `Bearer ${token}` },
           });
+          // Ensure cart data is correctly set even if it's empty
           setCartItems(cartResponse.data.data || {});
         }
       } catch (error) {

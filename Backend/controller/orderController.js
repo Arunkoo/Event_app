@@ -84,12 +84,16 @@ const verifyOrder = async (req, res) => {
 
 // userorders for frontend....
 const userOrders = async (req, res) => {
+  console.log("User ID from token:", req.user.id); // Log user ID extracted from token
   try {
-    const orders = await orderModel.find({ userId: req.user.id });
+    const orders = await orderModel.findOne({
+      userId: req.user.id,
+    });
+    console.log("Orders fetched:", orders); // Log orders retrieved from the database
     res.json({ success: true, data: orders });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error" });
+    console.log("Error fetching orders:", error); // Log any errors
+    res.json({ success: false, message: "Error fetching orders" });
   }
 };
 
