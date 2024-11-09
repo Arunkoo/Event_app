@@ -15,6 +15,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useLocation, useSearchParams } from "react-router-dom";
 import { StoreContext } from "./context/storeContext";
 import Verify from "./Pages/Verify";
+import Myorders from "./Pages/Myorders";
 
 function App() {
   const [showAuth, setShowAuth] = useState(false); // state for showing popup
@@ -55,6 +56,7 @@ function App() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/verify" element={<Verify />} />
+          <Route path="/myorders" element={<Myorders />} />
         </Routes>
 
         <Footer />
