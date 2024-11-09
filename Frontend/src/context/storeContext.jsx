@@ -28,17 +28,18 @@ const StoreContextProvider = (props) => {
       return;
     }
 
-    setCartItems((prev) => ({ ...prev, [itemId]: (prev[itemId] || 0) + 1 }));
-
     try {
       const response = await axios.post(
         `${url}/api/cart/add`,
         { itemId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      // Check if the backend response includes the updated cartData
       if (response.data.success) {
-        setCartItems(response.data.data); // Update cart with the latest data from the backend
+        // Update cartItems with the exact response data format
+        setCartItems((prev) => ({
+          ...prev,
+          [itemId]: (prev[itemId] || 0) + 1,
+        }));
       }
     } catch (error) {
       console.error("Error adding item to cart:", error);

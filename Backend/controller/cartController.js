@@ -3,25 +3,42 @@ import userModel from "../Models/userModel.js";
 // add to cart...
 const addToCart = async (req, res) => {
   try {
-    let userData = await userModel.findOne({ _id: req.body.userId });
-    let cartData = await userData.cartData;
-    if (!cartData[req.body.itemId]) {
-      cartData[req.body.itemId] = 1;
-    } else {
-      cartData[req.body.itemId] += 1;
+    const userId = req.user.id; // Extract userId from JWT token or request body
+
+    // Find the user by ID
+    const userData = await userModel.findOne({ _id: userId });
+
+    if (!userData) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-    await userModel.findByIdAndUpdate(req.body.userId, { cartData });
+
+    // Initialize cartData if it doesn't exist
+    if (!userData.cartData) {
+      userData.cartData = {};
+    }
+
+    // Increment or add item to cartData
+    if (userData.cartData[req.body.itemId]) {
+      userData.cartData[req.body.itemId]++;
+    } else {
+      userData.cartData[req.body.itemId] = 1;
+    }
+
+    await userData.save();
+
     res.json({ success: true, message: "Added to cart" });
   } catch (error) {
-    console.log(error);
-    res.json({ success: false, message: "Error" });
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
 // remove from cart
 const removeFromCart = async (req, res) => {
   try {
-    let userData = await userModel.findOne({ _id: req.body.userId });
+    let userData = await userModel.findOne({ _id: req.user.id });
     let cartData = await userData.cartData;
     if (cartData[req.body.itemId] > 0) {
       cartData[req.body.itemId] -= 1;
@@ -39,7 +56,7 @@ const removeFromCart = async (req, res) => {
 // fetchuser cart data...
 const getCart = async (req, res) => {
   try {
-    const userData = await userModel.findOne({ _id: req.body.userId });
+    const userData = await userModel.findOne({ _id: req.user.id });
 
     // Check if userData exists
     if (!userData) {

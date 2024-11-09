@@ -19,6 +19,7 @@ const UpcomingCard = ({
   const { AddToCart, cartItems, RemoveFromCart } = useContext(StoreContext);
   const isSmallScreen = useMediaQuery("(max-width:600px)"); //small screen breakpoint
   const { url } = useContext(StoreContext);
+
   return (
     <div className=" p-4 border   shadow-xl transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110  duration-300 relative">
       <FavoriteBorderOutlinedIcon className="absolute mt-2 ml-[380px] text-white size-3 z-10 cursor-pointer transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110  duration-300 " />
@@ -51,7 +52,7 @@ const UpcomingCard = ({
       </div>
       <div className="flex flex-1 mt-2 py-2 justify-between ">
         <h3 className="font-Poppins text-lg ">Price: ₹{price}</h3>
-        {!cartItems[id] ? (
+        {!cartItems?.[id] ? (
           <Button
             variant="contained"
             sx={{ backgroundColor: "black" }}
