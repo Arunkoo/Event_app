@@ -4,7 +4,9 @@ import { OAuth2Client } from "google-auth-library";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const authMiddleware = async (req, res, next) => {
-  const token = req.headers.authorization?.replace("Bearer ", "");
+  // Get token from header or cookie
+  const token =
+    req.headers.authorization?.replace("Bearer ", "") || req.cookies?.token;
 
   if (!token) {
     return res.status(401).json({ success: false, message: "Not authorized" });
@@ -12,7 +14,7 @@ const authMiddleware = async (req, res, next) => {
 
   try {
     const token_decode = jwt.verify(token, process.env.JWT_SECRET);
-    req.body.userId = token_decode.id;
+    req.user = { id: token_decode.id };
     return next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {
@@ -24,7 +26,7 @@ const authMiddleware = async (req, res, next) => {
           audience: process.env.GOOGLE_CLIENT_ID,
         });
         const payload = ticket.getPayload();
-        req.body.userId = payload.sub;
+        req.user = { id: payload.sub };
         return next();
       } catch (googleError) {
         return res.status(400).send("Invalid Google token");
