@@ -84,7 +84,7 @@ const Event = () => {
           {paginatedEvents.map((item, index) => (
             <UpcomingCard
               key={index}
-              id={item.id}
+              id={item._id}
               venue={item.venue}
               title={item.title}
               image={item.image}
