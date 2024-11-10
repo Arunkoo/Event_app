@@ -14,23 +14,23 @@ const addToCart = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    // Initialize cartData if it doesn't exist
-    if (!userData.cartData) {
-      userData.cartData = {};
+    // Check if event is already in cartData
+    if (userData.cartData.get(req.body.itemId)) {
+      return res.json({ success: false, message: "Event already in cart" });
     }
 
-    // Increment or add item to cartData
-    if (userData.cartData[req.body.itemId]) {
-      userData.cartData[req.body.itemId]++;
-    } else {
-      userData.cartData[req.body.itemId] = 1;
-    }
+    // Add event to cartData with a count of 1
+    userData.cartData.set(req.body.itemId, 1);
 
-    await userData.save();
+    // Save the updated user document
+    const updatedUser = await userData.save();
 
-    res.json({ success: true, message: "Added to cart" });
+    // Log the updated user document to verify cartData
+    // console.log("Updated User with cartData:", updatedUser);
+
+    res.json({ success: true, message: "Event added to cart" });
   } catch (error) {
-    console.error(error);
+    console.error("Error in addToCart:", error);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
@@ -38,18 +38,34 @@ const addToCart = async (req, res) => {
 // remove from cart
 const removeFromCart = async (req, res) => {
   try {
-    let userData = await userModel.findOne({ _id: req.user.id });
-    let cartData = await userData.cartData;
-    if (cartData[req.body.itemId] > 0) {
-      cartData[req.body.itemId] -= 1;
-      res.json({ success: true, message: "Event removed succesfully" });
-    } else {
-      res.json({ success: false, message: "Event is not present" });
+    const userData = await userModel.findOne({ _id: req.user.id });
+
+    // Check if userData exists
+    if (!userData) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-    await userModel.findByIdAndUpdate(req.body.userId, { cartData });
+
+    // Check if the item is in the cartData
+    const currentQuantity = userData.cartData.get(req.body.itemId);
+
+    if (currentQuantity && currentQuantity > 0) {
+      userData.cartData.set(req.body.itemId, currentQuantity - 1);
+
+      // Remove item from cart if quantity becomes 0
+      if (userData.cartData.get(req.body.itemId) === 0) {
+        userData.cartData.delete(req.body.itemId);
+      }
+
+      await userData.save();
+      res.json({ success: true, message: "Event removed successfully" });
+    } else {
+      res.json({ success: false, message: "Event is not present in the cart" });
+    }
   } catch (error) {
-    console.log(error);
-    res.json({ success: true, message: "Error" });
+    console.error("Error in removeFromCart:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
@@ -65,8 +81,8 @@ const getCart = async (req, res) => {
         .json({ success: false, message: "User not found" });
     }
 
-    // Access cartData from userData
-    const cartData = userData.cartData; // Adjust if the path to cartData is different
+    // Convert cartData from Map to Object
+    const cartData = Object.fromEntries(userData.cartData);
 
     res.json({ success: true, data: cartData });
   } catch (error) {
