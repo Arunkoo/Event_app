@@ -14,8 +14,18 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        let user = await userModel.findOne({ googleId: profile.id });
-        if (!user) {
+        // Find a user by email first
+        let user = await userModel.findOne({ email: profile.emails[0].value });
+
+        if (user) {
+          // If user exists, update googleId and any other info you need to update
+          user.googleId = profile.id; // Add or update the Google ID
+          user.name = profile.displayName || user.name; // Optionally update the name
+
+          // Save updated user
+          await user.save();
+        } else {
+          // If no user found, create a new user
           user = new userModel({
             googleId: profile.id,
             name: profile.displayName,
@@ -23,6 +33,7 @@ passport.use(
           });
           await user.save();
         }
+
         return done(null, user);
       } catch (error) {
         return done(error, null);
