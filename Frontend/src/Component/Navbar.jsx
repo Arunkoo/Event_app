@@ -16,17 +16,24 @@ import { useNavigate } from "react-router-dom";
 const Navbar = ({ setShowAuth, setCurrState }) => {
   const isSmallScreen = useMediaQuery("(max-width:600px)");
   const isLargeScreen = useMediaQuery("(min-width:1024px)");
+
   // store value ...
-  const { cartItems, token, setToken, setCartItems } = useContext(StoreContext);
+  const {
+    cartItems = {},
+    token,
+    setToken,
+    setCartItems,
+  } = useContext(StoreContext);
   const navigate = useNavigate();
+
   const totalItems = Object.values(cartItems).reduce(
-    (acc, count) => acc + count,
+    (acc, count) => acc + (count || 0),
     0
   );
 
   const onLogout = () => {
     setToken(null);
-    setCartItems({}); // Clear user-specific data
+    setCartItems({});
     localStorage.removeItem("token");
     toast.success("Logged out successfully!");
     navigate("/"); // Redirect to the homepage
@@ -55,7 +62,7 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
       <Stack direction="row" spacing={isSmallScreen ? 1.5 : 3} marginRight={4}>
         <NavLink to={"/cart"}>
           <Badge
-            className=" absolute ml-3"
+            className="absolute ml-3"
             color="success"
             badgeContent={totalItems}
           >
@@ -69,8 +76,8 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
               color="inherit"
               size={isSmallScreen ? "small" : "medium"}
               onClick={() => {
-                setCurrState("login"); // Use lowercase "login"
-                setShowAuth(true); // Show the popup
+                setCurrState("login");
+                setShowAuth(true);
               }}
             >
               Login
@@ -81,8 +88,8 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
               sx={{ backgroundColor: "black" }}
               size={isSmallScreen ? "small" : "medium"}
               onClick={() => {
-                setCurrState("sign_Up"); // Use lowercase "sign_Up"
-                setShowAuth(true); // Show the popup
+                setCurrState("sign_Up");
+                setShowAuth(true);
               }}
             >
               Get Started

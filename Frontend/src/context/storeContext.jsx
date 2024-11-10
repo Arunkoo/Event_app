@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import { createContext, useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -22,7 +21,9 @@ const StoreContextProvider = (props) => {
     setShowAuth(true); // Show authPop component
   };
 
+  // Add to cart....
   const AddToCart = async (itemId) => {
+    // Check for token before adding to cart
     if (!token) {
       notifyLoginRequired();
       return;
@@ -35,7 +36,7 @@ const StoreContextProvider = (props) => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (response.data.success) {
-        // Update cartItems with the exact response data format
+        // Only update the state for the affected item
         setCartItems((prev) => ({
           ...prev,
           [itemId]: (prev[itemId] || 0) + 1,
@@ -46,16 +47,14 @@ const StoreContextProvider = (props) => {
     }
   };
 
+  // Remove item from cart....
+  // Remove item from cart
   const RemoveFromCart = async (itemId) => {
+    // Check for token before removing from cart
     if (!token) {
       notifyLoginRequired();
       return;
     }
-
-    setCartItems((prev) => {
-      const newCount = (prev[itemId] || 0) - 1;
-      return { ...prev, [itemId]: newCount > 0 ? newCount : 0 };
-    });
 
     try {
       const response = await axios.post(
@@ -63,19 +62,25 @@ const StoreContextProvider = (props) => {
         { itemId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      // Check if the backend response includes the updated cartData
       if (response.data.success) {
-        setCartItems(response.data.data); // Update cart with the latest data from the backend
+        // Only update the state for the affected item
+        setCartItems((prev) => {
+          const updatedCart = { ...prev };
+          delete updatedCart[itemId];
+          return updatedCart;
+        });
       }
     } catch (error) {
-      console.error("Error while removing item from cart:", error);
+      console.error("Error removing item from cart:", error);
     }
   };
 
+  // Calculating totals, with checks to prevent errors
   const calculateTotals = useMemo(() => {
     let totalAmount = 0;
     for (const item in cartItems) {
       if (cartItems[item] > 0) {
+        // Check if eventList is populated and if the item exists in eventList
         const itemInfo = eventList.find((event) => event._id === item);
         if (itemInfo) {
           totalAmount += itemInfo.price * cartItems[item];

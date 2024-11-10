@@ -15,15 +15,15 @@ const UpcomingCard = ({
   id,
   category,
 }) => {
-  // store values...
-  const { AddToCart, cartItems, RemoveFromCart } = useContext(StoreContext);
-  const isSmallScreen = useMediaQuery("(max-width:600px)"); //small screen breakpoint
-  const { url } = useContext(StoreContext);
+  const { AddToCart, cartItems, RemoveFromCart, url } =
+    useContext(StoreContext);
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   return (
-    <div className=" p-4 border   shadow-xl transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110  duration-300 relative">
-      <FavoriteBorderOutlinedIcon className="absolute mt-2 ml-[380px] text-white size-3 z-10 cursor-pointer transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110  duration-300 " />
-      <ShareOutlinedIcon className="absolute mt-2 ml-[350px] text-white size-3 z-10 cursor-pointer transition ease-in-out delay-150  hover:-translate-y-1 hover:scale-110  duration-300" />
+    <div className="p-4 border shadow-xl transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 relative">
+      {/* Icons */}
+      <FavoriteBorderOutlinedIcon className="absolute mt-2 ml-[380px] text-white size-3 z-10 cursor-pointer transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 " />
+      <ShareOutlinedIcon className="absolute mt-2 ml-[350px] text-white size-3 z-10 cursor-pointer transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300" />
 
       <img
         src={`${url}/images/` + image}
@@ -46,18 +46,19 @@ const UpcomingCard = ({
         <h3 className="font-Poppins font-semibold text-[22px] antialiased hover:subpixel-antialiased">
           {title}
         </h3>
-        <p className="font-Poppins text-sm line-clamp-2 text-slate-600  leading-5">
+        <p className="font-Poppins text-sm line-clamp-2 text-slate-600 leading-5">
           {description}
         </p>
       </div>
-      <div className="flex flex-1 mt-2 py-2 justify-between ">
-        <h3 className="font-Poppins text-lg ">Price: ₹{price}</h3>
+
+      <div className="flex flex-1 mt-2 py-2 justify-between">
+        <h3 className="font-Poppins text-lg">Price: ₹{price}</h3>
         {!cartItems?.[id] ? (
           <Button
             variant="contained"
             sx={{ backgroundColor: "black" }}
             size={isSmallScreen ? "small" : "medium"}
-            onClick={() => AddToCart(id)}
+            onClick={() => AddToCart(id)} // Pass id only for the relevant card
           >
             Add To Cart
           </Button>
@@ -66,7 +67,7 @@ const UpcomingCard = ({
             variant="contained"
             sx={{ backgroundColor: "black" }}
             size={isSmallScreen ? "small" : "medium"}
-            onClick={() => RemoveFromCart(id)}
+            onClick={() => RemoveFromCart(id)} // Pass id only for the relevant card
           >
             Remove
           </Button>
