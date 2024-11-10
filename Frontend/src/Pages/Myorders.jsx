@@ -11,12 +11,12 @@ const Myorders = () => {
   //   fetch orders....
   const fetchOrders = async () => {
     try {
-      const response = await axios.post(
+      const response = await axios.get(
         url + "/api/order/userorders",
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      console.log(response); // Log full response
+      console.log(response.data.data); // Log full response
       setData(response.data.data);
     } catch (error) {
       console.error("Error fetching orders:", error);

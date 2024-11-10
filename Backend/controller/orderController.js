@@ -10,41 +10,43 @@ const stripe = new Stripe(process.env.Stripe_Secret_Key);
 const placeOrder = async (req, res) => {
   const frontendUrl = "http://localhost:5173";
 
-  console.log("Received order request:", req.body); // Log the received order data
+  console.log("Received order request:", req.body);
 
   try {
+    const { address, items, amount } = req.body; // Access the order data from req.body
+
     const newOrder = new orderModel({
-      userId: req.body.userId || "defaultUserId",
-      items: req.body.items,
-      amount: req.body.amount,
-      address: req.body.address,
+      userId: req.user.id,
+      items: items,
+      amount: amount,
+      address: address,
     });
 
     await newOrder.save();
-    await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
+    await userModel.findByIdAndUpdate(req.user.id, { cartData: {} });
 
     // Prepare items for Stripe payment link
-    const line_items = req.body.items.map((item) => ({
+    const line_items = items.map((item) => ({
       price_data: {
         currency: "inr",
         product_data: {
           name: item.title,
-          description: item.description || "", // Use description if available
+          description: item.description || "",
         },
-        unit_amount: item.price * 100, // Price in paise (multiply by 100 for INR)
+        unit_amount: item.price * 100, // Price in paise
       },
       quantity: item.quantity,
     }));
 
-    // Add delivery charges in paise
-    const deliveryCharge = 2 * 100; // Delivery charges in paise (2 INR)
+    // Add delivery charges
+    const deliveryCharge = 2 * 100; // Delivery charges in paise
     line_items.push({
       price_data: {
         currency: "inr",
         product_data: {
           name: "Delivery Charges",
         },
-        unit_amount: deliveryCharge, // Delivery charges
+        unit_amount: deliveryCharge,
       },
       quantity: 1,
     });
@@ -57,10 +59,9 @@ const placeOrder = async (req, res) => {
       cancel_url: `${frontendUrl}/verify?success=false&orderId=${newOrder._id}`,
     });
 
-    // Send session URL to the frontend
     res.json({ success: true, session_url: session.url });
   } catch (error) {
-    console.error("Error placing order:", error); // Log the error for debugging
+    console.error("Error placing order:", error);
     res.status(400).json({ success: false, message: "Error placing order" });
   }
 };
@@ -86,8 +87,8 @@ const verifyOrder = async (req, res) => {
 const userOrders = async (req, res) => {
   console.log("User ID from token:", req.user.id); // Log user ID extracted from token
   try {
-    const orders = await orderModel.findOne({
-      userId: req.user.id,
+    const orders = await orderModel.find({
+      userId: req.user.id, // Find all orders for the user
     });
     console.log("Orders fetched:", orders); // Log orders retrieved from the database
     res.json({ success: true, data: orders });
