@@ -11,15 +11,20 @@ const Myorders = () => {
   //   fetch orders....
   const fetchOrders = async () => {
     try {
-      const response = await axios.get(
-        url + "/api/order/userorders",
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      console.log(response.data.data); // Log full response
-      setData(response.data.data);
+      const response = await axios.get(url + "/api/order/userorders", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("Response:", response); // Log the entire response
+      if (response.data.success) {
+        setData(response.data.data);
+      } else {
+        console.error("Failed to fetch orders:", response.data.message);
+      }
     } catch (error) {
-      console.error("Error fetching orders:", error);
+      console.error(
+        "Error fetching orders:",
+        error.response ? error.response.data : error.message
+      );
     }
   };
 
