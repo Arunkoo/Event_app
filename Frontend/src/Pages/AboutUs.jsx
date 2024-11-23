@@ -116,11 +116,6 @@ const AboutUs = () => {
           </div>
         </div>
       </section>
-      {/* Our Mission */}
-      <h2 className=" text-center font-Poppins font-medium text-2xl mt-9 mr-12">
-        Our Mission
-      </h2>
-      <section className="mt-5 "></section>
     </div>
   );
 };
