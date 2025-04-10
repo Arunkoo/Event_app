@@ -13,7 +13,6 @@ const UpcomingCard = ({
   price,
   date,
   id,
-  category,
 }) => {
   const { AddToCart, cartItems, RemoveFromCart, url } =
     useContext(StoreContext);

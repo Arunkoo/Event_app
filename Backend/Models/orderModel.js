@@ -8,6 +8,8 @@ const orderSchema = new mongoose.Schema({
   status: { type: String, default: "Event Processing" },
   date: { type: Date, default: Date.now() },
   payment: { type: Boolean, default: false },
+  // new feature added..
+  qrCode: { type: String },
 });
 
 // Ensure we check for existing models to avoid overwriting

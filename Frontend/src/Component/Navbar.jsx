@@ -8,22 +8,36 @@ import { assest } from "../assests/assests";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MenuIcon from "@mui/icons-material/Menu";
 import { NavLink } from "react-router-dom";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { StoreContext } from "../context/storeContext";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { Avatar } from "@mui/material";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+// import LogoutIcon from "@mui/icons-material/Logout";
 
 const Navbar = ({ setShowAuth, setCurrState }) => {
   const isSmallScreen = useMediaQuery("(max-width:600px)");
   const isLargeScreen = useMediaQuery("(min-width:1024px)");
 
-  // store value ...
+  // Store values
   const {
     cartItems = {},
     token,
     setToken,
     setCartItems,
+    userName = "",
   } = useContext(StoreContext);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
   const navigate = useNavigate();
 
   const totalItems = Object.values(cartItems).reduce(
@@ -36,9 +50,42 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
     setCartItems({});
     localStorage.removeItem("token");
     toast.success("Logged out successfully!");
-    navigate("/"); // Redirect to the homepage
-    window.location.reload(); // Force an immediate page reload
+    navigate("/");
+    window.location.reload();
   };
+  const onTicket = () => {
+    navigate("/myOrders");
+  };
+
+  // Avatar setup
+  function stringToColor(string) {
+    let hash = 0;
+    let i;
+    for (i = 0; i < string.length; i += 1) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    let color = "#";
+    for (i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.slice(-2);
+    }
+    return color;
+  }
+
+  function stringAvatar(name = "Guest") {
+    const nameParts = name.trim().split(" ");
+    const initials =
+      nameParts.length > 1
+        ? `${nameParts[0][0]}${nameParts[1][0]}`
+        : nameParts[0][0];
+
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+      },
+      children: initials.toUpperCase(),
+    };
+  }
 
   return (
     <div className="flex flex-1 items-center justify-between gap-10 w-full border-b-2">
@@ -59,7 +106,13 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
         <NavLink to={"/contact"}>Contact Us</NavLink>
       </div>
 
-      <Stack direction="row" spacing={isSmallScreen ? 1.5 : 3} marginRight={4}>
+      <Stack
+        direction="row"
+        spacing={isSmallScreen ? 1.5 : 3}
+        marginRight={4}
+        alignItems={"center"}
+        justifyContent={"center"}
+      >
         <NavLink to={"/cart"}>
           <Badge
             className="absolute ml-3"
@@ -69,6 +122,7 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
             <LocalMallOutlinedIcon sx={{ fontSize: isSmallScreen ? 30 : 35 }} />
           </Badge>
         </NavLink>
+
         {!token ? (
           <>
             <Button
@@ -96,14 +150,36 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
             </Button>
           </>
         ) : (
-          <Button
-            variant="contained"
-            sx={{ backgroundColor: "black" }}
-            size={isSmallScreen ? "small" : "medium"}
-            onClick={onLogout}
-          >
-            LogOut
-          </Button>
+          <div>
+            <div
+              className="cursor-pointer shadow-2xl border-4 border-neutral-600/15 p-1 rounded-full"
+              id="basic-button"
+              aria-controls={open ? "basic-menu" : undefined}
+              aria-haspopup="true"
+              aria-expanded={open ? "true" : undefined}
+              onClick={handleClick}
+            >
+              <Avatar {...stringAvatar(userName || "Guest")} />
+            </div>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              MenuListProps={{
+                "aria-labelledby": "basic-button",
+              }}
+            >
+              <MenuItem
+                onClick={() => {
+                  onTicket();
+                }}
+              >
+                My Tickets
+              </MenuItem>
+              <MenuItem onClick={onLogout}>Logout</MenuItem>
+            </Menu>
+          </div>
         )}
 
         {!isLargeScreen && (

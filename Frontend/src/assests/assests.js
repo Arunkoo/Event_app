@@ -8,6 +8,7 @@ import pic5 from "./pic5.avif";
 import pic7 from "./pic7.jpg";
 import gkv from "./gkv.png";
 import Dark_logo from "./dark_logo.png";
+import aichat from "./aiBot.png";
 
 // grid in HeroSection
 import grid from "./Grid.jpg";
@@ -81,6 +82,7 @@ export const assest = {
   grid4,
   Dark_logo,
   close,
+  aichat,
 };
 //cartEmpty using section....
 export const illustration = {

@@ -1,7 +1,7 @@
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import UpcomingCard from "../Component/UpcomingCard";
-import { event_list } from "../assests/assests.js";
+
 import { useState } from "react";
 import Pagination from "@mui/material/Pagination";
 

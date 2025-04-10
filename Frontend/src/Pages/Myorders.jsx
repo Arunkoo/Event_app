@@ -2,14 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { StoreContext } from "../context/storeContext";
 import axios from "axios";
 import RedeemIcon from "@mui/icons-material/Redeem";
-import {
-  Button,
-  Card,
-  CardContent,
-  Typography,
-  Divider,
-  Paper,
-} from "@mui/material";
+import { CardContent, Typography, Divider, Paper } from "@mui/material";
 
 const Myorders = () => {
   const [data, setData] = useState([]);
@@ -76,9 +69,15 @@ const Myorders = () => {
                       </span>
                     ))}
                   </div>
+                  {order.qrCode && (
+                    <div>
+                      <h4>Event QR Code:</h4>
+                      <img src={order.qrCode} alt="QR Code" width={150} />
+                    </div>
+                  )}
                 </Typography>
                 <Typography variant="body1" className="text-gray-800">
-                  <span className="font-medium">Total:</span> ${order.amount}.00
+                  <span className="font-medium">Total:</span> ₹{order.amount}.00
                 </Typography>
                 <Typography variant="body2" className="text-gray-500">
                   <span className="font-medium">Status:</span>{" "}
@@ -93,7 +92,6 @@ const Myorders = () => {
                   </span>
                 </Typography>
               </div>
-
               <div className="mt-4 flex justify-between items-center">
                 <Typography variant="body2" className="text-gray-500">
                   {order.items.length} Items

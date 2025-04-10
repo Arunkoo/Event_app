@@ -1,7 +1,7 @@
 import { createContext, useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import { jwtDecode } from "jwt-decode";
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
@@ -15,10 +15,22 @@ const StoreContextProvider = (props) => {
     salesTax: 0,
     grandTotal: 0,
   });
+  const [userName, setUserName] = useState("Guest");
 
   const notifyLoginRequired = () => {
     toast.info("Please log in to continue.");
     setShowAuth(true); // Show authPop component
+  };
+  // 🔹 Extract user name from token
+  const extractUserName = (token) => {
+    try {
+      const decoded = jwtDecode(token);
+      console.log("Decoded Token:", decoded); // Debugging
+      return decoded?.name; // Ensure "name" exists
+    } catch (error) {
+      console.error("Invalid token:", error);
+      return null;
+    }
   };
 
   // Add to cart....
@@ -130,6 +142,16 @@ const StoreContextProvider = (props) => {
     setTotals(calculateTotals);
   }, [calculateTotals]);
 
+  useEffect(() => {
+    if (token) {
+      const extractedName = extractUserName(token);
+      setUserName(extractedName);
+      console.log("Updated User Name:", extractedName);
+    } else {
+      setUserName("Guest");
+    }
+  }, [token]); // Ensure it runs when token changes
+
   const contextValue = {
     AddToCart,
     cartItems,
@@ -142,6 +164,7 @@ const StoreContextProvider = (props) => {
     url,
     token,
     setToken,
+    userName,
   };
 
   return (

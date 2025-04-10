@@ -3,13 +3,13 @@ import orderModel from "../Models/orderModel.js";
 import userModel from "../Models/userModel.js";
 import Stripe from "stripe";
 import jwt from "jsonwebtoken";
+import QRCode from "qrcode";
 
 const stripe = new Stripe(process.env.Stripe_Secret_Key);
+const frontendUrl = "http://localhost:5173";
 
 // Place the user order
 const placeOrder = async (req, res) => {
-  const frontendUrl = "http://localhost:5173";
-
   console.log("Received order request:", req.body);
 
   try {
@@ -71,8 +71,13 @@ const verifyOrder = async (req, res) => {
   const { orderId, success } = req.body;
   try {
     if (success == "true") {
-      await orderModel.findByIdAndUpdate(orderId, { payment: true });
-      res.json({ success: true, message: "paid" });
+      const qrCodeData = `${frontendUrl}/order/${orderId}`;
+      const qrCodeImage = await QRCode.toDataURL(qrCodeData);
+      await orderModel.findByIdAndUpdate(orderId, {
+        payment: true,
+        qrCode: qrCodeImage,
+      });
+      res.json({ success: true, message: "paid", qrCode: qrCodeImage });
     } else {
       await orderModel.findByIdAndDelete(orderId);
       res.json({ success: false, message: "Not Paid" });

@@ -16,6 +16,7 @@ import { useLocation, useSearchParams } from "react-router-dom";
 import { StoreContext } from "./context/storeContext";
 import Verify from "./Pages/Verify";
 import Myorders from "./Pages/Myorders";
+import Chatbot from "./Component/Chatbot";
 
 function App() {
   const [showAuth, setShowAuth] = useState(false); // state for showing popup
@@ -58,6 +59,7 @@ function App() {
           <Route path="/verify" element={<Verify />} />
           <Route path="/myorders" element={<Myorders />} />
         </Routes>
+        <Chatbot />
 
         <Footer />
       </div>
