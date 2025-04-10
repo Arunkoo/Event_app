@@ -7,21 +7,20 @@ import Badge from "@mui/material/Badge";
 import { assest } from "../assests/assests";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import MenuIcon from "@mui/icons-material/Menu";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import { StoreContext } from "../context/storeContext";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 import { Avatar } from "@mui/material";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-// import LogoutIcon from "@mui/icons-material/Logout";
+import StreakIndicator from "./StreakIndicator";
+import { motion } from "framer-motion";
 
 const Navbar = ({ setShowAuth, setCurrState }) => {
   const isSmallScreen = useMediaQuery("(max-width:600px)");
   const isLargeScreen = useMediaQuery("(min-width:1024px)");
 
-  // Store values
   const {
     cartItems = {},
     token,
@@ -29,14 +28,11 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
     setCartItems,
     userName = "",
   } = useContext(StoreContext);
+
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+  const handleClick = (event) => setAnchorEl(event.currentTarget);
+  const handleClose = () => setAnchorEl(null);
 
   const navigate = useNavigate();
 
@@ -53,19 +49,18 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
     navigate("/");
     window.location.reload();
   };
+
   const onTicket = () => {
     navigate("/myOrders");
   };
 
-  // Avatar setup
   function stringToColor(string) {
     let hash = 0;
-    let i;
-    for (i = 0; i < string.length; i += 1) {
+    for (let i = 0; i < string.length; i++) {
       hash = string.charCodeAt(i) + ((hash << 5) - hash);
     }
     let color = "#";
-    for (i = 0; i < 3; i += 1) {
+    for (let i = 0; i < 3; i++) {
       const value = (hash >> (i * 8)) & 0xff;
       color += `00${value.toString(16)}`.slice(-2);
     }
@@ -88,7 +83,8 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-between gap-10 w-full border-b-2">
+    <div className="flex flex-1 items-center justify-between gap-10 w-full border-b-2 px-4 py-2">
+      {/* Logo */}
       <NavLink to={"/"}>
         <img
           src={assest.logo}
@@ -97,15 +93,37 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
         />
       </NavLink>
 
-      <div className="flex justify-center items-center gap-10 text-lg font-Poppins font-medium text-slate-600 max-lg:hidden">
-        <NavLink to={"/"} className="active:text-green-900">
-          Home
-        </NavLink>
-        <NavLink to={"/events"}>Events</NavLink>
-        <NavLink to={"/about"}>About Us</NavLink>
-        <NavLink to={"/contact"}>Contact Us</NavLink>
+      {/* Navigation Links */}
+      <div className="flex justify-center items-center gap-10 text-lg font-Poppins font-medium max-lg:hidden">
+        {["Home", "Events", "About", "Contact"].map((text) => (
+          <motion.div
+            whileHover={{
+              scale: 1.05,
+              textShadow: "0px 0px 8px rgba(34, 197, 94, 0.4)",
+            }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 300 }}
+            key={text}
+          >
+            <NavLink
+              to={`/${
+                text === "Home" ? "" : text.toLowerCase().replace(/\s/g, "")
+              }`}
+              className={({ isActive }) =>
+                `transition duration-200 ${
+                  isActive
+                    ? "text-green-600 font-semibold underline underline-offset-4"
+                    : "text-slate-600 hover:text-green-600"
+                }`
+              }
+            >
+              {text}
+            </NavLink>
+          </motion.div>
+        ))}
       </div>
 
+      {/* Right Section */}
       <Stack
         direction="row"
         spacing={isSmallScreen ? 1.5 : 3}
@@ -113,6 +131,7 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
         alignItems={"center"}
         justifyContent={"center"}
       >
+        {/* Cart Icon */}
         <NavLink to={"/cart"}>
           <Badge
             className="absolute ml-3"
@@ -123,6 +142,7 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
           </Badge>
         </NavLink>
 
+        {/* Auth Buttons */}
         {!token ? (
           <>
             <Button
@@ -150,7 +170,8 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
             </Button>
           </>
         ) : (
-          <div>
+          <div className="flex justify-center gap-4 p-1 items-center">
+            <StreakIndicator />
             <div
               className="cursor-pointer shadow-2xl border-4 border-neutral-600/15 p-1 rounded-full"
               id="basic-button"
@@ -170,18 +191,13 @@ const Navbar = ({ setShowAuth, setCurrState }) => {
                 "aria-labelledby": "basic-button",
               }}
             >
-              <MenuItem
-                onClick={() => {
-                  onTicket();
-                }}
-              >
-                My Tickets
-              </MenuItem>
+              <MenuItem onClick={onTicket}>My Tickets</MenuItem>
               <MenuItem onClick={onLogout}>Logout</MenuItem>
             </Menu>
           </div>
         )}
 
+        {/* Hamburger Icon (for mobile) */}
         {!isLargeScreen && (
           <MenuIcon sx={{ fontSize: 30, cursor: "pointer" }} />
         )}

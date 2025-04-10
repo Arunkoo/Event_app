@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Avatar, IconButton, TextField, CircularProgress } from "@mui/material";
 import { Send, Chat, Close } from "@mui/icons-material";
@@ -11,6 +11,7 @@ const Chatbot = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(true);
   const { url } = useContext(StoreContext);
   const predefinedQuestions = [
     "How to book an event?",
@@ -44,14 +45,24 @@ const Chatbot = () => {
     setLoading(false);
   };
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setShowPrompt(true);
+      setTimeout(() => setShowPrompt(false), 5000);
+    }, 20000); // every 20 seconds
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="fixed bottom-4 right-4 flex flex-col items-end z-50">
-      {/* Floating Chat Icon (Hidden when chatbot is open) */}
+      {/* Helper prompt */}
+
+      {/* Floating Chat Icon */}
       {!isOpen && (
         <motion.div whileTap={{ scale: 0.9 }}>
           <IconButton
             onClick={() => setIsOpen(true)}
-            className="bg-green-600 hover:bg-green-700 shadow-xl text-white p-3 rounded-full"
+            className="bg-green-600 hover:bg-green-700 shadow-xl text-white p-3 rounded-full animate-twinkle glow-chatbot"
           >
             <Chat fontSize="large" />
           </IconButton>
@@ -79,8 +90,6 @@ const Chatbot = () => {
                 </p>
               </div>
             </div>
-
-            {/* Close Button */}
             <IconButton
               onClick={() => setIsOpen(false)}
               className="text-gray-600"
@@ -141,6 +150,29 @@ const Chatbot = () => {
           </div>
         </motion.div>
       )}
+
+      {/* Styles */}
+      <style>{`
+        .animate-twinkle {
+          animation: twinkle 1.6s infinite;
+        }
+
+        @keyframes twinkle {
+          0% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+          }
+          70% {
+            box-shadow: 0 0 12px 6px rgba(34, 197, 94, 0.3);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+          }
+        }
+
+        .glow-chatbot {
+          box-shadow: 0 0 15px 4px rgba(34, 197, 94, 0.8);
+        }
+      `}</style>
     </div>
   );
 };

@@ -6,6 +6,8 @@ import {
   createToken,
 } from "../controller/userController.js";
 
+import userModel from "../Models/userModel.js";
+
 const authRouter = express.Router();
 
 authRouter.post("/sign_Up", registerUser);
@@ -49,5 +51,19 @@ authRouter.get("/logout", (req, res) => {
   req.logout();
   res.redirect(process.env.CLIENT_URL);
 });
+
+authRouter.put(
+  "/update-streak",
+  passport.authenticate("jwt", { session: false }),
+  async (req, res) => {
+    try {
+      const user = await userModel.findById(req.user._id);
+      await user.updateStreak();
+      res.json({ streak: user.streak.current });
+    } catch (err) {
+      res.status(500).send("Server error");
+    }
+  }
+);
 
 export default authRouter;

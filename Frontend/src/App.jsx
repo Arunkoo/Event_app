@@ -17,6 +17,7 @@ import { StoreContext } from "./context/storeContext";
 import Verify from "./Pages/Verify";
 import Myorders from "./Pages/Myorders";
 import Chatbot from "./Component/Chatbot";
+import HelpPrompt from "./Component/HelpPrompt";
 
 function App() {
   const [showAuth, setShowAuth] = useState(false); // state for showing popup
@@ -59,6 +60,7 @@ function App() {
           <Route path="/verify" element={<Verify />} />
           <Route path="/myorders" element={<Myorders />} />
         </Routes>
+        <HelpPrompt />
         <Chatbot />
 
         <Footer />
